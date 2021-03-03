@@ -2,88 +2,62 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/gdamore/tcell/v2"
+	"github.com/stingalleman/goland/cursor"
+	"github.com/stingalleman/goland/term"
 )
 
 var (
-	s        tcell.Screen
-	defStyle = tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
-	err      error
-	block    = '⬤'
-	x        = 5
-	y        = 5
+	wall      = '▉'
+	otherWall = '▃'
 )
 
 func main() {
-	// Initialize screen
-	s, err = tcell.NewScreen()
-	if err != nil {
-		log.Fatalf("%+v", err)
-	}
-	if err := s.Init(); err != nil {
-		log.Fatalf("%+v", err)
-	}
+	term := term.CreateTerm()
+	var cursorData = cursor.Data{X: 0, Y: 0, Character: '⬤'}
 
-	s.SetStyle(defStyle)
+	term.Screen.SetStyle(term.Style)
 
 	// Clear screen
-	s.Clear()
-	setBlock(4)
+	term.Screen.Clear()
+
+	term.Screen.SetContent(10, 15, otherWall, nil, term.Style)
+	term.Screen.SetContent(11, 15, otherWall, nil, term.Style)
+	term.Screen.SetContent(12, 15, otherWall, nil, term.Style)
+	term.Screen.SetContent(13, 15, otherWall, nil, term.Style)
+
+	term.Screen.SetContent(10, 10, wall, nil, term.Style)
+	term.Screen.SetContent(10, 11, wall, nil, term.Style)
+	term.Screen.SetContent(10, 12, wall, nil, term.Style)
+	term.Screen.SetContent(10, 13, wall, nil, term.Style)
+
+	cursor.PlaceCursor(5, 5, &cursorData, &term)
 
 	for {
-		s.Show()
+		term.Screen.Show()
 
-		event := s.PollEvent()
+		event := term.Screen.PollEvent()
 		switch event := event.(type) {
 		case *tcell.EventKey:
 			if event.Key() == tcell.KeyRight {
-				setBlock(2)
+				cursor.MoveRight(&cursorData, &term)
 			} else if event.Key() == tcell.KeyLeft {
-				setBlock(3)
+				cursor.MoveLeft(&cursorData, &term)
 			} else if event.Key() == tcell.KeyUp {
-				setBlock(0)
+				cursor.MoveUp(&cursorData, &term)
 			} else if event.Key() == tcell.KeyDown {
-				setBlock(1)
+				cursor.MoveDown(&cursorData, &term)
 			} else if event.Rune() == 'q' || event.Rune() == 'Q' {
-				quit()
+				quit(term)
 			}
 		}
 	}
 }
 
-// 0 forward
-// 1 backwards
-// 2 right
-// 3 left
-// 4 default
-func setBlock(action int) {
-	if action == 0 {
-		s.SetContent(x, y, ' ', nil, defStyle)
-		y--
-		s.SetContent(x, y, block, nil, defStyle)
-	} else if action == 1 {
-		s.SetContent(x, y, ' ', nil, defStyle)
-		y++
-		s.SetContent(x, y, block, nil, defStyle)
-	} else if action == 2 {
-		s.SetContent(x, y, ' ', nil, defStyle)
-		x = x + 2
-		s.SetContent(x, y, block, nil, defStyle)
-	} else if action == 3 {
-		s.GetContent(x, y)
-		s.SetContent(x, y, ' ', nil, defStyle)
-		x = x - 2
-		s.SetContent(x, y, block, nil, defStyle)
-	} else if action == 4 {
-		s.SetContent(x, y, block, nil, defStyle)
-	}
-}
-
-func quit() {
-	s.Fini()
+func quit(term term.Data) {
+	term.Screen.Fini()
 	fmt.Print("goodbye!...")
 	os.Exit(0)
 }
