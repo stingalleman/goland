@@ -7,33 +7,24 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/stingalleman/goland/cursor"
 	"github.com/stingalleman/goland/term"
-)
-
-var (
-	wall      = '▉'
-	otherWall = '▃'
+	"github.com/stingalleman/goland/walls"
 )
 
 func main() {
-	term := term.CreateTerm()
-	var cursorData = cursor.Data{X: 0, Y: 0, Character: '⬤'}
+	term := term.CreateTerm('█')
+	var cursorData = cursor.Data{X: 5, Y: 5, Character: '⬤'}
 
 	term.Screen.SetStyle(term.Style)
 
 	// Clear screen
 	term.Screen.Clear()
 
-	term.Screen.SetContent(10, 15, otherWall, nil, term.Style)
-	term.Screen.SetContent(11, 15, otherWall, nil, term.Style)
-	term.Screen.SetContent(12, 15, otherWall, nil, term.Style)
-	term.Screen.SetContent(13, 15, otherWall, nil, term.Style)
-
-	term.Screen.SetContent(10, 10, wall, nil, term.Style)
-	term.Screen.SetContent(10, 11, wall, nil, term.Style)
-	term.Screen.SetContent(10, 12, wall, nil, term.Style)
-	term.Screen.SetContent(10, 13, wall, nil, term.Style)
-
-	cursor.PlaceCursor(5, 5, &cursorData, &term)
+	walls.DrawWall(2, 2, 11, 2, &cursorData, &term)
+	walls.DrawWall(2, 8, 11, 8, &cursorData, &term)
+	walls.DrawWall(2, 2, 2, 7, &cursorData, &term)
+	walls.DrawWall(11, 2, 11, 3, &cursorData, &term)
+	walls.DrawWall(11, 6, 11, 8, &cursorData, &term)
+	cursor.PlaceCursor(cursorData.X, cursorData.Y, &cursorData, &term)
 
 	for {
 		term.Screen.Show()
@@ -58,6 +49,6 @@ func main() {
 
 func quit(term term.Data) {
 	term.Screen.Fini()
-	fmt.Print("goodbye!...")
+	fmt.Print("goodbye..!")
 	os.Exit(0)
 }

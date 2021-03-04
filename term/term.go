@@ -10,10 +10,11 @@ import (
 type Data struct {
 	Screen tcell.Screen
 	Style  tcell.Style
+	Wall   rune
 }
 
 // CreateTerm create new terminal and populate data
-func CreateTerm() Data {
+func CreateTerm(wall rune) Data {
 	// Initialize screen
 	s, err := tcell.NewScreen()
 	if err != nil {
@@ -23,5 +24,5 @@ func CreateTerm() Data {
 		log.Fatalf("%+v", err)
 	}
 
-	return Data{Screen: s, Style: tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)}
+	return Data{Screen: s, Style: tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset), Wall: wall}
 }
